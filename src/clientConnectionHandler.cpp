@@ -17,7 +17,7 @@
 using namespace std;
 
 #include "constants.h"
-#include "../include/clientconnectionhandler.h"
+#include "clientconnectionhandler.h"
 
 ClientConnectionHandler::ClientConnectionHandler(string hostName, int portNumber) {
 	this->hostName = hostName;
