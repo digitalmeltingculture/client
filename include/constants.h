@@ -10,9 +10,6 @@
 
 class Constants{
 	public:
-		const static int MAX_BUFFER_SIZE = 1024;
-		const static int SMALL_BUFFER_SIZE = 128;
-		const static int NUMERIC_BUFFER_SIZE = 8;
 
 		const static int DEFAULT_PORT_NUMBER = 8080;
 		const static int MAX_CONNECTIONS_NUMBER = 5;
@@ -26,10 +23,10 @@ class Constants{
 		const static int DOUBLE = 8;
 		const static int STRING = 9;
 
-		static constexpr const char* ERROR_MSG_SEND_TO_SERVER = "Error in sending data to server";
+		const static int MAX_BUFFER_SIZE = 1024;
+		const static int NUMERIC_DATA_SIZE = 8;
 
-		static constexpr const char* ERROR_MSG_SEND_INTEGER	  = "Error in sending integer data";
-		static constexpr const char* ERROR_MSG_SEND_STRING	  = "Error in sending string data";
+		static constexpr const char* ERROR_SEND_INTEGER = "Error sendIntenger function: integer data sent failed.";
 
 };
 
