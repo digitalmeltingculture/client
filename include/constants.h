@@ -26,17 +26,18 @@ public:
 	const static int MAX_BUFFER_SIZE = 1024;
 	const static int NUMERIC_DATA_SIZE = 8;
 	const static int CHAR_DATA_SIZE = 1;
-	static const constexpr char* ERROR_SEND_INTEGER =
+
+	static const constexpr char* ERROR_SEND_INTEGER_MSG =
 			"Error sendIntenger function: integer data sent failed.";
-	static const constexpr char* ERROR_SEND_FLOAT =
+	static const constexpr char* ERROR_SEND_FLOAT_MSG =
 			"Error sendFloat function: float data sent failed.";
-	static const constexpr char* ERROR_SEND_DOUBLE =
+	static const constexpr char* ERROR_SEND_DOUBLE_MSG =
 			"Error sendDouble function: double data sent failed.";
-	static constexpr const char* ERROR_SEND_CHAR =
+	static constexpr const char* ERROR_SEND_CHAR_MSG =
 			"Error sendIntenger function: integer data sent failed.";
-	static constexpr const char* ERROR_SEND_STRING =
+	static constexpr const char* ERROR_SEND_STRING_MSG =
 			"Error sendFloat function: float data sent failed.";
-	static constexpr const char* ERROR_SEND_END_CONNECTION =
+	static constexpr const char* ERROR_SEND_END_CONNECTION_MSG =
 				"Error sendFloat function: end connection  failed.";
 
 };

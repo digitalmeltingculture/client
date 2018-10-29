@@ -95,7 +95,7 @@ ssize_t ClientConnectionHandler::clientSend(const void *buffer, int type,
 	case 0:
 		//end of connection
 		if ((byteSent = this->sendClose(buffer)) == -1)
-				cout << Constants::ERROR_SEND_END_CONNECTION << endl;
+				cout << Constants::ERROR_SEND_END_CONNECTION_MSG << endl;
 
 			break;
 
@@ -115,34 +115,34 @@ ssize_t ClientConnectionHandler::clientSend(const void *buffer, int type,
 		//Carattere
 
 		if ((byteSent = this->sendChar(buffer)) == -1)
-			cout << Constants::ERROR_SEND_CHAR << endl;
+			cout << Constants::ERROR_SEND_CHAR_MSG << endl;
 
 		break;
 	case 4:
 		//int
 
 		if ((byteSent = this->sendIntenger(buffer)) == -1)
-			cout << Constants::ERROR_SEND_INTEGER << endl;
+			cout << Constants::ERROR_SEND_INTEGER_MSG << endl;
 
 		break;
 	case 5:
 		//float
 
 		if ((byteSent = this->sendFloat(buffer)) == -1)
-			cout << Constants::ERROR_SEND_FLOAT << endl;
+			cout << Constants::ERROR_SEND_FLOAT_MSG << endl;
 
 		break;
 	case 8:
 		//double
 
 		if ((byteSent = this->sendDouble(buffer)) == -1)
-			cout << Constants::ERROR_SEND_DOUBLE << endl;
+			cout << Constants::ERROR_SEND_DOUBLE_MSG << endl;
 
 		break;
 	case 9:
 		//Stringa
 		if ((byteSent = this->sendString(buffer)) == -1)
-			cout << Constants::ERROR_SEND_STRING << endl;
+			cout << Constants::ERROR_SEND_STRING_MSG << endl;
 
 		break;
 		//Caso default
