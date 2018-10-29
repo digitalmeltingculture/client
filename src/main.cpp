@@ -30,8 +30,6 @@ int main(int argc, char** argv) {
 	char tmp[8];
 	ssize_t risp, sockfds;
 
-	char a[] = "carlocom";
-
 	cout << "HOST = " << hostName << endl;
 	cout << "PORT = " << portNumber << endl;
 
@@ -40,9 +38,12 @@ int main(int argc, char** argv) {
 	sockfds = cliente->handleconnection();
 
 	int tmpInt = INT_MAX;
+	int tmpInt2 = 0;
 	risp = cliente->clientSend(&tmpInt, Constants::INTEGER, sockfds);
-
+	risp = cliente->clientSend(&tmpInt2, Constants::END_CONNECTION, sockfds);
 	cout << "ecco il ris" << risp << endl;
 	cout << "il socket" << sockfds << endl;
+
+
 
 }

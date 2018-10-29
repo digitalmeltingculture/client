@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include <sys/socket.h>
+#include <unistd.h>
 #include <stdlib.h>
 #include <netinet/in.h>
 #include <string.h>
@@ -17,9 +18,10 @@
 using namespace std;
 
 #include "constants.h"
-#include "clientconnectionhandler.h"
+#include "../include/clientconnectionhandler.h"
 
-ClientConnectionHandler::ClientConnectionHandler(string hostName, int portNumber) {
+ClientConnectionHandler::ClientConnectionHandler(string hostName,
+		int portNumber) {
 	this->hostName = hostName;
 	this->portNumber = portNumber;
 	this->sockFd = 0;
@@ -73,7 +75,8 @@ ssize_t ClientConnectionHandler::handleconnection() {
  */
 
 //NELLA LISTA ARGOMENTI, PRIMA IL SOCK FD, poi, buff, poi type
-ssize_t ClientConnectionHandler::clientSend(const void *buffer, int type, ssize_t sockfds) {
+ssize_t ClientConnectionHandler::clientSend(const void *buffer, int type,
+		ssize_t sockfds) {
 	ssize_t res;
 	size_t dim;
 	const void *strbuffer;
@@ -89,95 +92,64 @@ ssize_t ClientConnectionHandler::clientSend(const void *buffer, int type, ssize_
 
 	switch (type) {
 
-		case 0:
-			//end of connection
-			prova = (char *) calloc(Constants::NUMERIC_DATA_SIZE, sizeof(char));
-			strcat(prova, "0|");
+	case 0:
+		//end of connection
+		if ((byteSent = this->sendClose(buffer)) == -1)
+				cout << Constants::ERROR_SEND_END_CONNECTION << endl;
 
 			break;
 
-		case 1:
-			inttemp = (int *) buffer;
-			chartmp = (char *) calloc(Constants::NUMERIC_DATA_SIZE, sizeof(char));
-			sprintf(chartmp, "%d", *inttemp);
-			prova = (char *) calloc(Constants::NUMERIC_DATA_SIZE, sizeof(char));
-			strcat(prova, "4|");
-			strcat(prova, chartmp);
-			break;
+	case 1:
+		// byte
+//		if ((byteSent = this->sendByte(buffer)) == -1)
+//				cout << Constants::ERROR_SEND_INTEGER << endl;
 
 			break;
 
-		case 2:
-			//boolean
+	case 2:
+		//boolean
 
-			break;
+		break;
 
-		case 3:
-			//Stringa
+	case 3:
+		//Carattere
 
-			inttempst = (char *) buffer;
-			size_t a, b;
-			a= strlen(inttempst);
+		if ((byteSent = this->sendChar(buffer)) == -1)
+			cout << Constants::ERROR_SEND_CHAR << endl;
 
-			chartmp = (char *) calloc(Constants::NUMERIC_DATA_SIZE, sizeof(char));
-			sprintf(chartmp, "%s", inttempst);
-			prova = (char *) calloc(a, sizeof(char));
-			strcat(prova, "3|");
-			strcat(prova, chartmp);
-			b = strlen(prova);
-			cout << "lunghezza" << b << endl;
-			cout << "la styringa inviata e" << prova << endl;
-			break;
-			break;
+		break;
+	case 4:
+		//int
 
-		case 4:
-			//int
-			if( ( byteSent = this->sendIntenger(buffer)) == -1)
-				cout << Constants::ERROR_SEND_INTEGER << endl;
+		if ((byteSent = this->sendIntenger(buffer)) == -1)
+			cout << Constants::ERROR_SEND_INTEGER << endl;
 
-			break;
+		break;
+	case 5:
+		//float
 
-		case 5:
-			//float
+		if ((byteSent = this->sendFloat(buffer)) == -1)
+			cout << Constants::ERROR_SEND_FLOAT << endl;
 
-			inttempfl = (float *) buffer;
-			chartmp = (char *) calloc(Constants::NUMERIC_DATA_SIZE, sizeof(char));
-			sprintf(chartmp, "%f", *inttempfl);
-			prova = (char *) calloc(8, sizeof(char));
-			strcat(prova, "5|");
-			strcat(prova, chartmp);
-			break;
-		case 8:
-			//double
+		break;
+	case 8:
+		//double
 
-			inttempdb = (double *) buffer;
-			chartmp = (char *) calloc(Constants::NUMERIC_DATA_SIZE, sizeof(char));
-			sprintf(chartmp, "%fl", *inttempdb);
-			prova = (char *) calloc(8, sizeof(char));
-			strcat(prova, "8|");
-			strcat(prova, chartmp);
-			break;
-		case 9:
-			//Stringa
+		if ((byteSent = this->sendDouble(buffer)) == -1)
+			cout << Constants::ERROR_SEND_DOUBLE << endl;
 
-			inttempst = (char *) buffer;
-			size_t z, y;
-			z = strlen(inttempst);
+		break;
+	case 9:
+		//Stringa
+		if ((byteSent = this->sendString(buffer)) == -1)
+			cout << Constants::ERROR_SEND_STRING << endl;
 
-			chartmp = (char *) calloc(Constants::NUMERIC_DATA_SIZE, sizeof(char));
-			sprintf(chartmp, "%s", inttempst);
-			prova = (char *) calloc(z, sizeof(char));
-			strcat(prova, "9|");
-			strcat(prova, chartmp);
-			y = strlen(prova);
-			cout << "lunghezza" << y << endl;
-			cout << "la styringa inviata e" << prova << endl;
-			break;
-			//Caso default
-		default:
-			cout << "Tipo non ammesso" << endl;
-			res = -1;
-			break;
+		break;
+		//Caso default
+	default:
+		cout << "Tipo non ammesso" << endl;
+		res = -1;
+		break;
 
 	}
 //	if (send(sockfds, prova, dim, 0) < 0) {
@@ -188,24 +160,213 @@ ssize_t ClientConnectionHandler::clientSend(const void *buffer, int type, ssize_
 	return res;
 }
 
-size_t ClientConnectionHandler::sendIntenger(const void* arg){
+//Function send integer
+
+size_t ClientConnectionHandler::sendIntenger(const void* arg) {
 	int *intVal = NULL;
-	char *charVal = NULL, *prefix=NULL, *msg=NULL;
-	intVal = (int*)arg;
+	char *charVal = NULL, *prefix = NULL, *msg = NULL;
+	intVal = (int*) arg;
 
 	size_t byteSent = -1;
-	size_t msgSize = 2*Constants::NUMERIC_DATA_SIZE + 2;
+	size_t msgSize = 2 * Constants::NUMERIC_DATA_SIZE + 2;
 
-	charVal = (char *) calloc(Constants::NUMERIC_DATA_SIZE +1, sizeof(char));
-	prefix  = (char *) calloc(Constants::NUMERIC_DATA_SIZE +2, sizeof(char));
-	msg  	= (char *) calloc(msgSize, sizeof(char));
+	charVal = (char *) calloc(Constants::NUMERIC_DATA_SIZE + 1, sizeof(char));
+	prefix = (char *) calloc(Constants::NUMERIC_DATA_SIZE + 2, sizeof(char));
+	msg = (char *) calloc(msgSize, sizeof(char));
 
 	sprintf(charVal, "%d", *intVal);
 	sprintf(prefix, "%d", Constants::INTEGER);
 
 	strcat(prefix, "|");
-	strcat(msg,prefix);
-	strcat(msg,charVal);
+	strcat(msg, prefix);
+	strcat(msg, charVal);
+
+	byteSent = send(this->sockFd, msg, msgSize, 0);
+
+	cout << "MSG = " << msg << ". Byte: " << byteSent << endl;
+	free(charVal);
+	free(prefix);
+	free(msg);
+
+	return byteSent;
+}
+
+//Function send Float
+
+size_t ClientConnectionHandler::sendFloat(const void* arg) {
+	float *intVal = NULL;
+	char *charVal = NULL, *prefix = NULL, *msg = NULL;
+	intVal = (float*) arg;
+
+	size_t byteSent = -1;
+	size_t msgSize = 2 * Constants::NUMERIC_DATA_SIZE + 2;
+
+	charVal = (char *) calloc(Constants::NUMERIC_DATA_SIZE + 1, sizeof(char));
+	prefix = (char *) calloc(Constants::NUMERIC_DATA_SIZE + 2, sizeof(char));
+	msg = (char *) calloc(msgSize, sizeof(char));
+
+	sprintf(charVal, "%f", *intVal);
+	sprintf(prefix, "%d", Constants::FLOAT);
+
+	strcat(prefix, "|");
+	strcat(msg, prefix);
+	strcat(msg, charVal);
+
+	byteSent = send(this->sockFd, msg, msgSize, 0);
+
+	cout << "MSG = " << msg << ". Byte: " << byteSent << endl;
+	free(charVal);
+	free(prefix);
+	free(msg);
+
+	return byteSent;
+}
+
+//Function send Double
+
+size_t ClientConnectionHandler::sendDouble(const void* arg) {
+	double *intVal = NULL;
+	char *charVal = NULL, *prefix = NULL, *msg = NULL;
+	intVal = (double*) arg;
+
+	size_t byteSent = -1;
+	size_t msgSize = 2 * Constants::NUMERIC_DATA_SIZE + 2;
+
+	charVal = (char *) calloc(Constants::NUMERIC_DATA_SIZE + 1, sizeof(char));
+	prefix = (char *) calloc(Constants::NUMERIC_DATA_SIZE + 2, sizeof(char));
+	msg = (char *) calloc(msgSize, sizeof(char));
+
+	sprintf(charVal, "%lf", *intVal);
+	sprintf(prefix, "%d", Constants::DOUBLE);
+
+	strcat(prefix, "|");
+	strcat(msg, prefix);
+	strcat(msg, charVal);
+
+	byteSent = send(this->sockFd, msg, msgSize, 0);
+
+	cout << "MSG = " << msg << ". Byte: " << byteSent << endl;
+	free(charVal);
+	free(prefix);
+	free(msg);
+
+	return byteSent;
+}
+
+ //Function send Byte
+
+size_t ClientConnectionHandler::sendByte(const void* arg) {
+	int *intVal = NULL;
+	char *charVal = NULL, *prefix = NULL, *msg = NULL;
+	intVal = (int*) arg;
+
+	size_t byteSent = -1;
+	size_t msgSize = 2 * Constants::NUMERIC_DATA_SIZE + 2;
+
+	charVal = (char *) calloc(Constants::NUMERIC_DATA_SIZE + 1, sizeof(char));
+	prefix = (char *) calloc(Constants::NUMERIC_DATA_SIZE + 2, sizeof(char));
+	msg = (char *) calloc(msgSize, sizeof(char));
+
+	sprintf(charVal, "%d", *intVal);
+	sprintf(prefix, "%d", Constants::FLOAT);
+
+	strcat(prefix, "|");
+	strcat(msg, prefix);
+	strcat(msg, charVal);
+
+	byteSent = send(this->sockFd, msg, msgSize, 0);
+
+	cout << "MSG = " << msg << ". Byte: " << byteSent << endl;
+	free(charVal);
+	free(prefix);
+	free(msg);
+
+	return byteSent;
+}
+
+//Function send Char
+
+size_t ClientConnectionHandler::sendChar(const void* arg) {
+	int *intVal = NULL;
+	char *charVal = NULL, *prefix = NULL, *msg = NULL;
+	intVal = (int*) arg;
+
+	size_t byteSent = -1;
+	size_t msgSize = 2 * Constants::CHAR_DATA_SIZE + 2;
+
+	charVal = (char *) calloc(Constants::CHAR_DATA_SIZE + 1, sizeof(char));
+	prefix = (char *) calloc(Constants::CHAR_DATA_SIZE + 2, sizeof(char));
+	msg = (char *) calloc(msgSize, sizeof(char));
+
+	sprintf(charVal, "%d", *intVal);
+	sprintf(prefix, "%d", Constants::CHAR);
+
+	strcat(prefix, "|");
+	strcat(msg, prefix);
+	strcat(msg, charVal);
+
+	byteSent = send(this->sockFd, msg, msgSize, 0);
+
+	cout << "MSG = " << msg << ". Byte: " << byteSent << endl;
+	free(charVal);
+	free(prefix);
+	free(msg);
+
+	return byteSent;
+}
+
+//Function send String
+
+size_t ClientConnectionHandler::sendString(const void* arg) {
+	char *intVal = NULL;
+	char *charVal = NULL, *prefix = NULL, *msg = NULL;
+	intVal = (char*) arg;
+	int dim;
+
+	size_t byteSent = -1;
+	size_t msgSize = 2 * dim *Constants::CHAR_DATA_SIZE + 2;
+	dim=strlen(intVal);
+	charVal = (char *) calloc(dim*Constants::CHAR_DATA_SIZE + 1, sizeof(char));
+	prefix = (char *) calloc(dim*Constants::CHAR_DATA_SIZE + 2, sizeof(char));
+	msg = (char *) calloc(msgSize, sizeof(char));
+
+	sprintf(charVal, "%d", *intVal);
+	sprintf(prefix, "%d", Constants::STRING);
+
+	strcat(prefix, "|");
+	strcat(msg, prefix);
+	strcat(msg, charVal);
+
+	byteSent = send(this->sockFd, msg, msgSize, 0);
+
+	cout << "MSG = " << msg << ". Byte: " << byteSent << endl;
+	free(charVal);
+	free(prefix);
+	free(msg);
+
+	return byteSent;
+}
+
+//Function send END CONNECTION
+
+size_t ClientConnectionHandler::sendClose(const void* arg) {
+	int *intVal = NULL;
+	char *charVal = NULL, *prefix = NULL, *msg = NULL;
+	intVal = (int*) arg;
+
+	size_t byteSent = -1;
+	size_t msgSize = 2 * Constants::CHAR_DATA_SIZE + 2;
+
+	charVal = (char *) calloc(Constants::CHAR_DATA_SIZE + 1, sizeof(char));
+	prefix = (char *) calloc(Constants::CHAR_DATA_SIZE + 2, sizeof(char));
+	msg = (char *) calloc(msgSize, sizeof(char));
+
+	sprintf(charVal, "%d", *intVal);
+	sprintf(prefix, "%d", Constants::END_CONNECTION);
+
+	strcat(prefix, "|");
+	strcat(msg, prefix);
+	strcat(msg, charVal);
 
 	byteSent = send(this->sockFd, msg, msgSize, 0);
 

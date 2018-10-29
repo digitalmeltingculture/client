@@ -32,7 +32,12 @@ public:
 	ssize_t clientSend(const void *, int, ssize_t);
 
 	size_t sendIntenger(const void*);
-
+	size_t sendFloat(const void*);
+	size_t sendDouble(const void*);
+	size_t sendByte(const void*);
+	size_t sendChar(const void*);
+	size_t sendString(const void*);
+	size_t sendClose(const void*);
 };
 
 #endif /* CLIENT_H_ */
