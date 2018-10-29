@@ -34,11 +34,11 @@ public:
 	static const constexpr char* ERROR_SEND_DOUBLE_MSG =
 			"Error sendDouble function: double data sent failed.";
 	static constexpr const char* ERROR_SEND_CHAR_MSG =
-			"Error sendIntenger function: integer data sent failed.";
+			"Error sendChar function: char data sent failed.";
 	static constexpr const char* ERROR_SEND_STRING_MSG =
-			"Error sendFloat function: float data sent failed.";
+			"Error sendString function: string data sent failed.";
 	static constexpr const char* ERROR_SEND_END_CONNECTION_MSG =
-				"Error sendFloat function: end connection  failed.";
+				"Error sendEndConnection function: end connection  failed.";
 
 };
 
