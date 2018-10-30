@@ -89,7 +89,7 @@ ssize_t ClientConnectionHandler::clientSend(const void *buffer, int type,
 	const char *inttempst;
 
 	size_t byteSent = -1;
-
+cout <<"Client Send"<<endl;
 	switch (type) {
 
 	case 0:
@@ -167,7 +167,7 @@ size_t ClientConnectionHandler::sendIntenger(const void* arg) {
 	char *charVal = NULL, *prefix = NULL, *msg = NULL;
 	intVal = (int*) arg;
 
-	size_t byteSent = -1;
+	ssize_t byteSent = -1;
 	size_t msgSize = 2 * Constants::NUMERIC_DATA_SIZE + 2;
 
 	charVal = (char *) calloc(Constants::NUMERIC_DATA_SIZE + 1, sizeof(char));
@@ -181,12 +181,15 @@ size_t ClientConnectionHandler::sendIntenger(const void* arg) {
 	strcat(msg, prefix);
 	strcat(msg, charVal);
 
+	sleep(5);
 	byteSent = send(this->sockFd, msg, msgSize, 0);
 
 	cout << "MSG = " << msg << ". Byte: " << byteSent << endl;
 	free(charVal);
 	free(prefix);
 	free(msg);
+
+	sleep(5);
 
 	return byteSent;
 }

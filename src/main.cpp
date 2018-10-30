@@ -37,10 +37,20 @@ int main(int argc, char** argv) {
 
 	sockfds = cliente->handleconnection();
 
+	/*
+	 * funzione per invio di dati in modo casuale
+	 * all'interno di un while fino a 10
+	 *
+	 * dorme un numero arbitrario di secondi tra 1 e 5.
+	 * quando si sveglia, genera un numero casuale tra 0 e 9. questo sarò il prefisso.
+	 * fa lo switch che in base al prefisso manda un int, string, ecc
+	 *
+	 * ripete fino alla fine del while
+	 */
 	int tmpInt = INT_MAX;
 	int tmpInt2 = 0;
 	risp = cliente->clientSend(&tmpInt, Constants::INTEGER, sockfds);
-	risp = cliente->clientSend(&tmpInt2, Constants::END_CONNECTION, sockfds);
+	//risp = cliente->clientSend(&tmpInt2, Constants::END_CONNECTION, sockfds);
 	cout << "ecco il ris" << risp << endl;
 	cout << "il socket" << sockfds << endl;
 
